@@ -3,7 +3,6 @@ from datetime import datetime
 from pathlib import Path
 import uuid
 import re
-import os
 
 import segno
 from flask import current_app
@@ -31,20 +30,13 @@ def create_qr_for_agreement(agreement: Agreement) -> str:
     base = current_app.config["PUBLIC_BASE_URL"].rstrip("/")
     url = f"{base}/verify?ref={agreement.reference}"
 
-    qr_dir: Path = Path(current_app.config["QR_FOLDER"])
+    qr_dir = Path(current_app.config["QR_FOLDER"])
     qr_dir.mkdir(parents=True, exist_ok=True)
     filename = f"{agreement.reference}.png"
     filepath = qr_dir / filename
 
     qr = segno.make(url, error="m")
-    qr.save(
-        str(filepath),
-        kind="png",
-        scale=8,
-        border=2,
-        dark="#0a1628",
-        light="white",
-    )
+    qr.save(str(filepath), kind="png", scale=8, border=2, dark="#0a1628", light="white")
 
     agreement.qr_filename = f"qrcodes/{filename}"
     db.session.add(agreement)
@@ -67,41 +59,47 @@ def allowed_file(filename: str) -> bool:
 
 def save_plot_image(file_storage):
     """
-    Save uploaded image to static/uploads/plots/.
-    Returns relative path under static/ (e.g. uploads/plots/abc123.jpg) or None.
+    Save an uploaded image into static/uploads/plots/.
+    Returns path relative to static/ e.g. 'uploads/plots/abc.jpg', or None on failure.
     """
     if file_storage is None:
         return None
-    # Werkzeug may give empty FileStorage when no file chosen
-    filename = getattr(file_storage, "filename", None) or ""
-    if not filename.strip():
+
+    filename = (getattr(file_storage, "filename", None) or "").strip()
+    if not filename:
         return None
+
     if not allowed_file(filename):
+        current_app.logger.warning("Rejected file type: %s", filename)
         return None
 
-    original = secure_filename(filename)
-    # If secure_filename stripped everything (odd names), keep extension only
-    if not original or "." not in original:
-        ext = filename.rsplit(".", 1)[-1].lower()
-        original = f"image.{ext}"
-
-    ext = original.rsplit(".", 1)[1].lower()
-    name = f"{uuid.uuid4().hex[:16]}.{ext}"
+    # Keep a safe extension
+    ext = filename.rsplit(".", 1)[1].lower()
+    if ext == "jpeg":
+        ext = "jpg"
+    name = f"{uuid.uuid4().hex}.{ext}"
 
     upload_dir = Path(current_app.config["UPLOAD_FOLDER"])
     upload_dir.mkdir(parents=True, exist_ok=True)
     dest = upload_dir / name
 
     try:
+        # Use string path for Windows compatibility
         file_storage.save(str(dest))
-    except Exception as e:
-        current_app.logger.error("Image save failed: %s", e)
+    except Exception as exc:
+        current_app.logger.exception("Failed to save upload %s: %s", filename, exc)
         return None
 
     if not dest.is_file() or dest.stat().st_size == 0:
-        current_app.logger.error("Image file missing or empty after save: %s", dest)
+        current_app.logger.error("Upload empty after save: %s", dest)
+        try:
+            dest.unlink(missing_ok=True)
+        except Exception:
+            pass
         return None
 
+    current_app.logger.info("Saved plot image: %s (%s bytes)", dest, dest.stat().st_size)
+    # Path under static/ for url_for('static', filename=...)
     return f"uploads/plots/{name}"
 
 

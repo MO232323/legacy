@@ -72,17 +72,25 @@ def plots():
 
 
 def _apply_images(plot, form_files):
-    """Attach up to 3 uploaded images to plot fields. Returns count saved."""
+    """Save up to 3 images from the multipart form. Returns number saved."""
+    from app.services import save_plot_image
     saved = 0
     for i, key in enumerate(("image1", "image2", "image3"), start=1):
         f = form_files.get(key)
         if f is None:
             continue
+        # Empty file field from browser
+        if not getattr(f, "filename", None):
+            continue
         path = save_plot_image(f)
         if path:
-            setattr(plot, f"image{i}", path)
+            setattr(plot, "image%d" % i, path)
             saved += 1
+        else:
+            from flask import flash
+            flash("Could not save file: %s (use JPG/PNG/WEBP under 16MB)" % f.filename, "error")
     return saved
+
 
 
 @admin_bp.route("/plots/new", methods=["GET", "POST"])
@@ -103,13 +111,26 @@ def plot_new():
         if Plot.query.filter_by(plot_code=plot.plot_code).first():
             flash(f"Plot code {plot.plot_code} already exists.", "error")
             return render_template("admin/plot_form.html", plot=None)
+        # Debug: list what the browser sent
+        file_keys = list(request.files.keys())
         n = _apply_images(plot, request.files)
         db.session.add(plot)
         db.session.commit()
         if n:
             flash(f"Plot created with {n} photo(s).", "success")
         else:
-            flash("Plot created. No photos uploaded — you can add them by editing the plot.", "warning")
+            if file_keys:
+                flash(
+                    "Plot created but photos were not saved. "
+                    "Use JPG or PNG. Files received: " + ", ".join(file_keys),
+                    "error",
+                )
+            else:
+                flash(
+                    "Plot created with no photos. "
+                    "Make sure you click Choose File before Save.",
+                    "warning",
+                )
         return redirect(url_for("admin.plots"))
     return render_template("admin/plot_form.html", plot=None)
 

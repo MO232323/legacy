@@ -12,11 +12,16 @@ login_manager.login_message_category = "warning"
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    # Ensure upload limits apply
-    app.config.setdefault("MAX_CONTENT_LENGTH", 16 * 1024 * 1024)
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
-    app.config["QR_FOLDER"].mkdir(parents=True, exist_ok=True)
-    app.config["UPLOAD_FOLDER"].mkdir(parents=True, exist_ok=True)
+    # Always save under app/static so Flask can serve files
+    from pathlib import Path as _Path
+    upload_dir = _Path(app.root_path) / "static" / "uploads" / "plots"
+    qr_dir = _Path(app.root_path) / "static" / "qrcodes"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    qr_dir.mkdir(parents=True, exist_ok=True)
+    app.config["UPLOAD_FOLDER"] = str(upload_dir)
+    app.config["QR_FOLDER"] = str(qr_dir)
     (BASE_DIR / "instance").mkdir(parents=True, exist_ok=True)
 
     db.init_app(app)
