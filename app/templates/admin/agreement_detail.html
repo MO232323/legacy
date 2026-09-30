@@ -1,0 +1,41 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ agreement.reference }}{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+  <div>
+    <h1 style="margin-bottom:4px">{{ agreement.reference }}</h1>
+    <p style="color:var(--ink-muted)">{{ agreement.buyer_name }} · {{ agreement.plot.plot_code }}</p>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a href="{{ url_for('public.agreement_view', ref=agreement.reference) }}" target="_blank" class="btn btn-primary">Open buyer page ↗</a>
+    <a href="{{ url_for('public.verify', ref=agreement.reference) }}" target="_blank" class="btn btn-outline">Verify page ↗</a>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr auto;gap:32px;align-items:start">
+  <div class="table-wrap" style="padding:20px">
+    <dl style="display:grid;grid-template-columns:140px 1fr;gap:10px 16px;font-size:.95rem">
+      <dt style="color:var(--ink-muted)">Buyer</dt><dd><strong>{{ agreement.buyer_name }}</strong></dd>
+      <dt style="color:var(--ink-muted)">Phone</dt><dd>{{ agreement.buyer_phone or '—' }}</dd>
+      <dt style="color:var(--ink-muted)">Email</dt><dd>{{ agreement.buyer_email or '—' }}</dd>
+      <dt style="color:var(--ink-muted)">Plot</dt><dd>{{ agreement.plot.plot_code }} — {{ agreement.plot.title }}</dd>
+      <dt style="color:var(--ink-muted)">Location</dt><dd>{{ agreement.plot.city }}</dd>
+      <dt style="color:var(--ink-muted)">Size</dt><dd>{{ agreement.plot.size_sqm }} m²</dd>
+      <dt style="color:var(--ink-muted)">Status</dt><dd>{{ agreement.status }}</dd>
+      <dt style="color:var(--ink-muted)">Agreement date</dt><dd>{{ agreement.agreement_date.strftime('%d %B %Y') }}</dd>
+      {% if agreement.notes %}<dt style="color:var(--ink-muted)">Notes</dt><dd>{{ agreement.notes }}</dd>{% endif %}
+    </dl>
+  </div>
+  <div style="text-align:center">
+    {% if agreement.qr_filename %}
+    <img src="{{ url_for('static', filename=agreement.qr_filename) }}" alt="QR" style="width:160px;height:160px;border:1px solid var(--border);border-radius:8px" />
+    <p style="font-size:.8rem;color:var(--ink-muted);margin-top:8px">QR points to verification page</p>
+    <a href="{{ url_for('static', filename=agreement.qr_filename) }}" download class="btn btn-sm btn-outline" style="margin-top:8px">Download QR</a>
+    {% endif %}
+  </div>
+</div>
+
+<form action="{{ url_for('admin.agreement_delete', agr_id=agreement.id) }}" method="post" style="margin-top:32px" onsubmit="return confirm('Delete this agreement? Plot will be marked Available again.')">
+  <button type="submit" class="btn btn-danger">Delete agreement</button>
+</form>
+{% endblock %}

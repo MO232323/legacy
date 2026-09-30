@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="stats-grid">
+  <div class="stat-card"><strong>{{ stats.plots }}</strong><span>Total plots</span></div>
+  <div class="stat-card"><strong>{{ stats.available }}</strong><span>Available</span></div>
+  <div class="stat-card"><strong>{{ stats.sold }}</strong><span>Sold</span></div>
+  <div class="stat-card"><strong>{{ stats.agreements }}</strong><span>Agreements</span></div>
+  <div class="stat-card"><strong>{{ stats.leads }}</strong><span>New leads</span></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+  <div>
+    <h2 style="font-size:1.1rem;margin-bottom:12px">Recent agreements</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Reference</th><th>Buyer</th><th>Plot</th></tr></thead>
+        <tbody>
+          {% for a in recent_agreements %}
+          <tr>
+            <td><a href="{{ url_for('admin.agreement_detail', agr_id=a.id) }}" style="color:var(--accent);font-weight:600">{{ a.reference }}</a></td>
+            <td>{{ a.buyer_name }}</td>
+            <td>{{ a.plot.plot_code }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No agreements yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <h2 style="font-size:1.1rem;margin-bottom:12px">Recent viewing requests</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>City</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for l in recent_leads %}
+          <tr>
+            <td>{{ l.name }}</td>
+            <td>{{ l.city }}</td>
+            <td><span class="badge badge-{{ l.status|lower }}">{{ l.status }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No requests yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<p style="margin-top:24px">
+  <a href="{{ url_for('admin.agreement_new') }}" class="btn btn-primary">New sale agreement</a>
+  <a href="{{ url_for('admin.plot_new') }}" class="btn btn-outline">Add plot</a>
+</p>
+{% endblock %}

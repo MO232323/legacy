@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin login — Legacies Realty</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <span class="logo-mark">LR</span>
+        <strong style="color:var(--navy)">Legacies Realty</strong>
+      </div>
+      <h1>Admin sign in</h1>
+      <p class="sub">Manage plots, agreements and viewing requests.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" style="margin-bottom:16px">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      <form method="post" class="admin-form" style="border:none;padding:0;max-width:none">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required autofocus />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

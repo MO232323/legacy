@@ -1,0 +1,38 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Plots{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <h1 style="margin:0">Plots</h1>
+  <a href="{{ url_for('admin.plot_new') }}" class="btn btn-primary">Add plot</a>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th></th><th>Code</th><th>Title</th><th>City</th><th>Size</th><th>Price</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for p in plots %}
+      <tr>
+        <td style="width:56px">{% if p.cover_image() %}<img src="{{ url_for('static', filename=p.cover_image()) }}" alt="" style="width:48px;height:36px;object-fit:cover;border-radius:6px">{% else %}<span style="color:var(--ink-muted);font-size:.75rem">No photo</span>{% endif %}</td>
+        <td><strong>{{ p.plot_code }}</strong></td>
+        <td>{{ p.title }}</td>
+        <td>{{ p.city }}</td>
+        <td>{{ p.size_sqm }} m²</td>
+        <td>{{ format_price(p.price_mwk) }}</td>
+        <td><span class="badge badge-{{ p.status|lower }}">{{ p.status }}</span></td>
+        <td>
+          <a href="{{ url_for('admin.plot_edit', plot_id=p.id) }}" style="color:var(--accent)">Edit</a>
+          {% if not p.agreement %}
+          <form action="{{ url_for('admin.plot_delete', plot_id=p.id) }}" method="post" style="display:inline" onsubmit="return confirm('Delete this plot?')">
+            <button type="submit" style="background:none;border:none;color:var(--danger);cursor:pointer;font:inherit">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8">No plots yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

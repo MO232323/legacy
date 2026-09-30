@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Verify ownership{% endblock %}
+{% block content %}
+<section class="page">
+  <div class="container page-narrow">
+    <div class="section-header" style="margin-bottom:32px">
+      <p class="eyebrow">Buyer portal</p>
+      <h2>Verify your plot</h2>
+      <p class="section-lead">Enter the reference from your Legacies Realty sale agreement, or scan the QR code on it.</p>
+    </div>
+    <div class="verify-box">
+      <form method="get" action="{{ url_for('public.verify') }}" class="verify-form">
+        <label for="refInput">Reference number</label>
+        <div class="input-row">
+          <input type="text" id="refInput" name="ref" value="{{ ref }}" placeholder="e.g. LR-2026-BLY-0001" required autofocus />
+          <button type="submit" class="btn btn-primary">Look up</button>
+        </div>
+      </form>
+      {% if error %}
+      <div class="verify-result error" style="margin-top:24px">
+        <h4>❌ No record found</h4>
+        <p style="font-size:.95rem;color:var(--ink-muted)">{{ error }}</p>
+      </div>
+      {% elif agreement %}
+      <div class="verify-result success" style="margin-top:24px">
+        <h4>✅ Ownership confirmed</h4>
+        <dl>
+          <dt>Buyer</dt><dd>{{ agreement.buyer_name }}</dd>
+          <dt>Reference</dt><dd>{{ agreement.reference }}</dd>
+          <dt>Plot ID</dt><dd>{{ agreement.plot.plot_code }}</dd>
+          <dt>Location</dt><dd>{{ agreement.plot.city }} — {{ agreement.plot.title }}</dd>
+          <dt>Size</dt><dd>{{ agreement.plot.size_sqm }} m²</dd>
+          <dt>Type</dt><dd>{{ agreement.plot.plot_type }}</dd>
+          <dt>Status</dt><dd>{{ agreement.status }}</dd>
+          <dt>Agreement date</dt><dd>{{ agreement.agreement_date.strftime('%d %B %Y') }}</dd>
+          {% if agreement.plot.coordinates %}<dt>Coordinates</dt><dd>{{ agreement.plot.coordinates }}</dd>{% endif %}
+        </dl>
+        <p style="margin-top:16px"><a href="{{ url_for('public.agreement_view', ref=agreement.reference) }}" class="btn btn-sm btn-outline-dark">View full agreement</a></p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
