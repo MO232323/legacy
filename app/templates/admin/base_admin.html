@@ -5,23 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Admin{% endblock %} — Legacies Realty</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <link rel="icon" href="{{ url_for('static', filename='img/logo-icon.png') }}" type="image/png" />
 </head>
 <body class="admin-body">
+  <header class="admin-topbar">
+    <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="adminSidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="{{ url_for('admin.dashboard') }}" class="admin-topbar-brand">
+      <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="" />
+      <span>Legacies Admin</span>
+    </a>
+    <a href="{{ url_for('public.home') }}" class="admin-topbar-site" target="_blank" rel="noopener">Website ↗</a>
+  </header>
+
+  <div class="admin-overlay" id="adminOverlay" hidden></div>
+
   <div class="admin-layout">
-    <aside class="admin-sidebar">
-      <a href="{{ url_for('admin.dashboard') }}" class="logo">
-        <span class="logo-mark">LR</span>
-        <span>Admin</span>
-      </a>
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-head">
+        <a href="{{ url_for('admin.dashboard') }}" class="logo">
+          <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="" class="logo-img" style="height:36px;width:auto;background:#fff;border-radius:8px;padding:2px" />
+          <span>Admin</span>
+        </a>
+        <button type="button" class="admin-close-btn" id="adminCloseBtn" aria-label="Close menu">×</button>
+      </div>
       <nav class="admin-nav">
         <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a>
-        <a href="{{ url_for('admin.plots') }}" class="{% if 'plot' in (request.endpoint or '') %}active{% endif %}">Plots</a>
-        <a href="{{ url_for('admin.agreements') }}" class="{% if 'agreement' in (request.endpoint or '') %}active{% endif %}">Agreements</a>
+        <a href="{{ url_for('admin.sites') }}" class="{% if 'site' in (request.endpoint or '') or 'plot' in (request.endpoint or '') %}active{% endif %}">Sites & Plots</a>
+        <a href="{{ url_for('admin.certificates') }}" class="{% if 'certificate' in (request.endpoint or '') %}active{% endif %}">Certificates</a>
         <a href="{{ url_for('admin.leads') }}" class="{% if 'lead' in (request.endpoint or '') %}active{% endif %}">Viewing requests</a>
-        <a href="{{ url_for('public.home') }}" target="_blank">View website ↗</a>
-        <a href="{{ url_for('admin.logout') }}">Sign out</a>
+        <a href="{{ url_for('public.home') }}" target="_blank" rel="noopener">View website ↗</a>
+        <a href="{{ url_for('admin.logout') }}" class="admin-nav-logout">Sign out</a>
       </nav>
     </aside>
     <main class="admin-main">
@@ -35,5 +52,46 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+
+  <script>
+  (function () {
+    var btn = document.getElementById("adminMenuBtn");
+    var closeBtn = document.getElementById("adminCloseBtn");
+    var sidebar = document.getElementById("adminSidebar");
+    var overlay = document.getElementById("adminOverlay");
+    if (!btn || !sidebar) return;
+
+    function openMenu() {
+      sidebar.classList.add("is-open");
+      overlay.hidden = false;
+      overlay.classList.add("is-visible");
+      btn.setAttribute("aria-expanded", "true");
+      document.body.classList.add("admin-menu-open");
+    }
+    function closeMenu() {
+      sidebar.classList.remove("is-open");
+      overlay.classList.remove("is-visible");
+      overlay.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("admin-menu-open");
+    }
+    function toggle() {
+      if (sidebar.classList.contains("is-open")) closeMenu();
+      else openMenu();
+    }
+
+    btn.addEventListener("click", toggle);
+    closeBtn && closeBtn.addEventListener("click", closeMenu);
+    overlay.addEventListener("click", closeMenu);
+    sidebar.querySelectorAll(".admin-nav a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (window.matchMedia("(max-width: 960px)").matches) closeMenu();
+      });
+    });
+    window.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeMenu();
+    });
+  })();
+  </script>
 </body>
 </html>

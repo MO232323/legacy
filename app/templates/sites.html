@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Available sites{% endblock %}
+{% block content %}
+<section class="page">
+  <div class="container">
+    <div class="section-header">
+      <p class="eyebrow">Inventory</p>
+      <h2>All sites</h2>
+      <p class="section-lead">Browse land developments across Malawi. Click a site to see available plots.</p>
+    </div>
+    <form method="get" style="margin-bottom:36px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center">
+      <label for="city" style="font-weight:600;font-size:.9rem;color:var(--navy)">Filter by city</label>
+      <select name="city" id="city" class="form-control" style="width:auto;border-radius:8px;padding:10px 16px;border:1px solid var(--border)" onchange="this.form.submit()">
+        <option value="">All cities</option>
+        {% for c in cities %}
+        <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    <div class="plots-grid">
+      {% for s in sites %}
+      <article class="plot-card">
+        <div class="plot-image-wrap">
+          {% if s.cover_image() %}
+          <img src="{{ media_url(s.cover_image()) }}" alt="{{ s.name }}" loading="lazy" />
+          {% else %}
+          <img src="{{ url_for('static', filename='img/plot-placeholder.svg') }}" alt="{{ s.name }}" class="plot-placeholder-img" />
+          {% endif %}
+          <span class="plot-badge">{{ s.available_count() }} available</span>
+        </div>
+        <div class="plot-body">
+          <div class="plot-city">{{ s.city }}</div>
+          <h3>{{ s.name }}</h3>
+          <p class="plot-meta">{{ s.site_code }} · {{ s.plots|length }} plot{{ 's' if s.plots|length != 1 else '' }}</p>
+          <p class="plot-price">{{ format_site_price(s) }}</p>
+          <div class="plot-actions">
+            <a href="{{ url_for('public.site_detail', site_id=s.id) }}" class="btn btn-sm btn-outline-dark">View site & plots</a>
+            <a href="{{ whatsapp_link('', s.name, s.city) }}" class="btn btn-sm btn-whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+          </div>
+        </div>
+      </article>
+      {% else %}
+      <p style="grid-column:1/-1;text-align:center;color:var(--ink-muted)">No sites match your filter.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

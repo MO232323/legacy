@@ -1,44 +1,39 @@
 {% extends "base.html" %}
-{% block title %}Verify ownership{% endblock %}
+{% block title %}Verify certificate{% endblock %}
 {% block content %}
 <section class="page">
-  <div class="container page-narrow">
-    <div class="section-header" style="margin-bottom:32px">
-      <p class="eyebrow">Buyer portal</p>
-      <h2>Verify your plot</h2>
-      <p class="section-lead">Enter the reference from your Legacies Realty sale agreement, or scan the QR code on it.</p>
+  <div class="container" style="max-width:560px">
+    <div class="section-header" style="text-align:center">
+      <p class="eyebrow">Ownership verification</p>
+      <h2>Verify a certificate</h2>
+      <p class="section-lead">Enter the unique reference from your Land Purchase Certificate.</p>
     </div>
-    <div class="verify-box">
-      <form method="get" action="{{ url_for('public.verify') }}" class="verify-form">
-        <label for="refInput">Reference number</label>
-        <div class="input-row">
-          <input type="text" id="refInput" name="ref" value="{{ ref }}" placeholder="e.g. LR-2026-BLY-0001" required autofocus />
-          <button type="submit" class="btn btn-primary">Look up</button>
-        </div>
-      </form>
-      {% if error %}
-      <div class="verify-result error" style="margin-top:24px">
-        <h4>❌ No record found</h4>
-        <p style="font-size:.95rem;color:var(--ink-muted)">{{ error }}</p>
+    <form method="get" action="{{ url_for('public.verify') }}" class="admin-form" style="margin-bottom:28px">
+      <div class="form-group">
+        <label for="ref">Reference number</label>
+        <input type="text" id="ref" name="ref" value="{{ ref or '' }}" placeholder="e.g. LR-2026-BLY-0001" required style="text-transform:uppercase" />
       </div>
-      {% elif agreement %}
-      <div class="verify-result success" style="margin-top:24px">
-        <h4>✅ Ownership confirmed</h4>
-        <dl>
-          <dt>Buyer</dt><dd>{{ agreement.buyer_name }}</dd>
-          <dt>Reference</dt><dd>{{ agreement.reference }}</dd>
-          <dt>Plot ID</dt><dd>{{ agreement.plot.plot_code }}</dd>
-          <dt>Location</dt><dd>{{ agreement.plot.city }} — {{ agreement.plot.title }}</dd>
-          <dt>Size</dt><dd>{{ agreement.plot.size_sqm }} m²</dd>
-          <dt>Type</dt><dd>{{ agreement.plot.plot_type }}</dd>
-          <dt>Status</dt><dd>{{ agreement.status }}</dd>
-          <dt>Agreement date</dt><dd>{{ agreement.agreement_date.strftime('%d %B %Y') }}</dd>
-          {% if agreement.plot.coordinates %}<dt>Coordinates</dt><dd>{{ agreement.plot.coordinates }}</dd>{% endif %}
-        </dl>
-        <p style="margin-top:16px"><a href="{{ url_for('public.agreement_view', ref=agreement.reference) }}" class="btn btn-sm btn-outline-dark">View full agreement</a></p>
-      </div>
-      {% endif %}
+      <button type="submit" class="btn btn-primary btn-block">Verify</button>
+    </form>
+    {% if error %}
+    <div class="flash flash-error">{{ error }}</div>
+    {% endif %}
+    {% if certificate %}
+    <div class="admin-detail-card" style="border:1px solid var(--border);border-radius:12px;padding:24px">
+      <p style="color:var(--green,#0a7);font-weight:600;margin-bottom:12px">✓ Valid certificate found</p>
+      <p><strong>Reference:</strong> {{ certificate.reference }}</p>
+      <p><strong>Buyer:</strong> {{ certificate.buyer_name }}</p>
+      <p><strong>Plot:</strong> {{ certificate.plot.plot_code }}</p>
+      <p><strong>Site:</strong> {{ certificate.plot.site.name }}</p>
+      <p><strong>Location:</strong> {{ certificate.plot.site.city }}</p>
+      <p><strong>Size:</strong> {{ certificate.plot.display_size() }}</p>
+      <p><strong>Date:</strong> {{ certificate.certificate_date.strftime('%d %B %Y') }}</p>
+      <p><strong>Status:</strong> {{ certificate.status }}</p>
+      <p style="margin-top:16px">
+        <a href="{{ url_for('public.certificate_view', ref=certificate.reference) }}" class="btn btn-outline-dark">View full certificate</a>
+      </p>
     </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

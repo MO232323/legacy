@@ -1,0 +1,40 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Certificates{% endblock %}
+{% block content %}
+<div class="admin-page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1>Land Purchase Certificates</h1>
+  <a href="{{ url_for('admin.certificate_new') }}" class="btn btn-primary">+ New certificate</a>
+</div>
+{% if certificates %}
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Reference</th>
+      <th>Buyer</th>
+      <th>Plot</th>
+      <th>Site</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in certificates %}
+    <tr>
+      <td><a href="{{ url_for('admin.certificate_detail', cert_id=c.id) }}"><strong>{{ c.reference }}</strong></a></td>
+      <td>{{ c.buyer_name }}</td>
+      <td>{{ c.plot.plot_code }}</td>
+      <td>{{ c.plot.site.name }}</td>
+      <td>{{ c.certificate_date.strftime('%d %b %Y') }}</td>
+      <td>{{ c.status }}</td>
+      <td>
+        <a href="{{ url_for('admin.certificate_detail', cert_id=c.id) }}" class="btn btn-sm btn-outline-dark">View</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="color:var(--ink-muted)">No certificates yet. <a href="{{ url_for('admin.certificate_new') }}">Issue one</a>.</p>
+{% endif %}
+{% endblock %}

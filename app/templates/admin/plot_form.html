@@ -1,89 +1,59 @@
 {% extends "admin/base_admin.html" %}
-{% block title %}{{ 'Edit' if plot else 'New' }} plot{% endblock %}
+{% block title %}{{ "Edit plot" if plot else "Add plot" }}{% endblock %}
 {% block content %}
-<h1>{{ 'Edit' if plot else 'Add' }} plot</h1>
-<form method="post" class="admin-form" enctype="multipart/form-data" style="max-width:640px">
+<div class="admin-page-head">
+  <h1>{{ "Edit plot" if plot else "Add plot" }} — {{ site.name }}</h1>
+  <p style="color:var(--ink-muted)">{{ site.site_code }} · {{ site.city }}</p>
+</div>
+<form class="admin-form" method="post" style="max-width:640px">
   <div class="form-group">
-    <label for="plot_code">Plot code *</label>
-    <input type="text" id="plot_code" name="plot_code" value="{{ plot.plot_code if plot else '' }}" required placeholder="e.g. BLY-SEC3-042" />
-  </div>
-  <div class="form-group">
-    <label for="city">City *</label>
-    <select id="city" name="city" required>
-      {% for c in ['Blantyre','Lilongwe','Mzuzu','Mangochi'] %}
-      <option value="{{ c }}" {% if plot and plot.city == c %}selected{% endif %}>{{ c }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="title">Title *</label>
-    <input type="text" id="title" name="title" value="{{ plot.title if plot else '' }}" required />
+    <label>Plot code *</label>
+    <input type="text" name="plot_code" required value="{{ plot.plot_code if plot else '' }}" placeholder="e.g. MPEMBA-01" />
   </div>
   <div class="form-row">
     <div class="form-group">
-      <label for="size_sqm">Size (m²) *</label>
-      <input type="number" id="size_sqm" name="size_sqm" value="{{ plot.size_sqm if plot else '' }}" required min="1" />
+      <label>Exact size (m²) — optional</label>
+      <input type="number" name="size_sqm" min="0" value="{{ plot.size_sqm if plot and plot.size_sqm else '' }}" placeholder="e.g. 450" />
     </div>
     <div class="form-group">
-      <label for="price_mwk">Price (MWK)</label>
-      <input type="number" id="price_mwk" name="price_mwk" value="{{ plot.price_mwk if plot and plot.price_mwk else '' }}" min="0" />
+      <label>Size label (flexible)</label>
+      <input type="text" name="size_label" value="{{ plot.size_label if plot and plot.size_label else '' }}" placeholder="e.g. Corner plot" />
     </div>
   </div>
   <div class="form-row">
     <div class="form-group">
-      <label for="plot_type">Type</label>
-      <select id="plot_type" name="plot_type">
-        {% for t in ['Residential','Commercial','Investment','Residential / Investment'] %}
+      <label>Price (MWK)</label>
+      <input type="number" name="price_mwk" min="0" value="{{ plot.price_mwk if plot and plot.price_mwk else '' }}" placeholder="e.g. 5500000" />
+    </div>
+    <div class="form-group">
+      <label>Price type</label>
+      <select name="price_is_from">
+        <option value="0" {% if not plot or not plot.price_is_from %}selected{% endif %}>Fixed price</option>
+        <option value="1" {% if plot and plot.price_is_from %}selected{% endif %}>Starting from</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Type</label>
+      <select name="plot_type">
+        {% for t in ['Residential','Investment','Commercial','Mixed'] %}
         <option value="{{ t }}" {% if plot and plot.plot_type == t %}selected{% endif %}>{{ t }}</option>
         {% endfor %}
       </select>
     </div>
     <div class="form-group">
-      <label for="status">Status</label>
-      <select id="status" name="status">
+      <label>Status</label>
+      <select name="status">
         {% for s in ['Available','Reserved','Sold'] %}
         <option value="{{ s }}" {% if plot and plot.status == s %}selected{% endif %}>{{ s }}</option>
         {% endfor %}
       </select>
     </div>
   </div>
-  <div class="form-group">
-    <label for="coordinates">Coordinates</label>
-    <input type="text" id="coordinates" name="coordinates" value="{{ plot.coordinates if plot else '' }}" placeholder="e.g. 15.78°S, 35.01°E" />
-  </div>
-  <div class="form-group">
-    <label for="description">Description</label>
-    <textarea id="description" name="description" rows="3">{{ plot.description if plot else '' }}</textarea>
-  </div>
-
-  <div style="border-top:1px solid var(--border);padding-top:18px;margin-top:8px">
-    <p style="font-weight:700;color:var(--navy);margin-bottom:8px">Plot photos (up to 3)</p>
-    <p style="font-size:.85rem;color:var(--ink-muted);margin-bottom:12px">Accepted: JPG, PNG, WEBP, GIF — max 5&nbsp;MB each. Photo 1 is the cover on listings.</p>
-    <div class="form-group">
-      <label for="image1">Photo 1 (cover)</label>
-      <input type="file" id="image1" name="image1" accept="image/*" />
-    </div>
-    <div class="form-group">
-      <label for="image2">Photo 2</label>
-      <input type="file" id="image2" name="image2" accept="image/*" />
-    </div>
-    <div class="form-group">
-      <label for="image3">Photo 3</label>
-      <input type="file" id="image3" name="image3" accept="image/*" />
-    </div>
-    {% if plot and plot.images() %}
-    <div class="thumb-preview">
-      {% for img in plot.images() %}
-      <img src="{{ url_for('static', filename=img) }}" alt="Current" />
-      {% endfor %}
-    </div>
-    <p style="font-size:.8rem;color:var(--ink-muted);margin-top:6px">Upload new files to replace. Leave empty to keep current photos.</p>
-    {% endif %}
-  </div>
-
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary">Save plot</button>
-    <a href="{{ url_for('admin.plots') }}" class="btn btn-outline-dark">Cancel</a>
+    <button type="submit" class="btn btn-primary">{{ "Save changes" if plot else "Add plot" }}</button>
+    <a href="{{ url_for('admin.site_plots', site_id=site.id) }}" class="btn btn-outline">Cancel</a>
   </div>
 </form>
 {% endblock %}

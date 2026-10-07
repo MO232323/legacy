@@ -1,0 +1,199 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ "Edit site" if site else "Add site" }}{% endblock %}
+{% block content %}
+<div class="admin-page-head">
+  <h1>{{ "Edit site" if site else "Add site" }}</h1>
+</div>
+<form class="admin-form" method="post" enctype="multipart/form-data" style="max-width:800px" id="siteForm">
+  <h3 style="font-size:0.95rem;margin:0 0 10px;color:var(--navy)">Site details</h3>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Site code *</label>
+      <input type="text" name="site_code" required value="{{ site.site_code if site else '' }}" placeholder="e.g. MPEMBA" />
+    </div>
+    <div class="form-group">
+      <label>City *</label>
+      <select name="city" required>
+        {% for c in ['Blantyre','Lilongwe','Mzuzu','Mangochi'] %}
+        <option value="{{ c }}" {% if site and site.city == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Site name *</label>
+    <input type="text" name="name" required value="{{ site.name if site else '' }}" placeholder="e.g. Mpemba ESCOM Right Turn" />
+  </div>
+  <div class="form-group">
+    <label>Location note</label>
+    <input type="text" name="location_note" value="{{ site.location_note if site and site.location_note else '' }}" placeholder="e.g. About 700 metres from M1 road" />
+  </div>
+  <div class="form-group">
+    <label>Coordinates (optional)</label>
+    <input type="text" name="coordinates" value="{{ site.coordinates if site and site.coordinates else '' }}" placeholder="e.g. -15.78, 35.01" />
+  </div>
+  <div class="form-group">
+    <label>Description (shared by all plots on this site)</label>
+    <textarea name="description" rows="4" placeholder="Full description of the site / estate">{{ site.description if site and site.description else '' }}</textarea>
+  </div>
+
+  <h3 style="font-size:0.95rem;margin:18px 0 10px;color:var(--navy)">Site price</h3>
+  <p style="font-size:0.85rem;color:var(--ink-muted);margin-bottom:10px">
+    If every plot on this site has the <strong>same price</strong>, choose Fixed and enter one amount.
+    Otherwise choose Varies — each plot will have its own price.
+  </p>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Price type</label>
+      <select name="price_fixed" id="priceFixed">
+        <option value="1" {% if site and site.price_fixed %}selected{% endif %}>Fixed (same for all plots)</option>
+        <option value="0" {% if not site or not site.price_fixed %}selected{% endif %}>Varies (per plot)</option>
+      </select>
+    </div>
+    <div class="form-group" id="sitePriceGroup">
+      <label>Price (MWK)</label>
+      <input type="number" name="price_mwk" id="sitePriceMwk" min="0" value="{{ site.price_mwk if site and site.price_mwk else '' }}" placeholder="e.g. 4500000" />
+    </div>
+  </div>
+{% if site %}
+  <div class="form-group" id="applyPriceGroup" style="margin-bottom:16px">
+    <label style="display:flex;align-items:center;gap:8px;font-weight:500">
+      <input type="checkbox" name="apply_price_to_plots" value="1" />
+      Apply this fixed price to all existing plots on this site
+    </label>
+  </div>
+{% endif %}
+
+  <h3 style="font-size:0.95rem;margin:18px 0 10px;color:var(--navy)">Photos (up to 3) — site level</h3>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Photo 1</label>
+      <input type="file" name="image1" accept="image/*" />
+    </div>
+    <div class="form-group">
+      <label>Photo 2</label>
+      <input type="file" name="image2" accept="image/*" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Photo 3</label>
+    <input type="file" name="image3" accept="image/*" />
+  </div>
+  {% if site and site.images() %}
+  <div class="thumb-preview">
+    {% for img in site.images() %}
+    <img src="{{ media_url(img) }}" alt="" />
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <h3 style="font-size:0.95rem;margin:18px 0 10px;color:var(--navy)">Site plan / layout</h3>
+  <p style="font-size:0.85rem;color:var(--ink-muted);margin-bottom:10px">Upload the layout drawing. Shown on the public site detail page.</p>
+  <div class="form-group">
+    <label>Site plan image</label>
+    <input type="file" name="site_plan" accept="image/*" />
+  </div>
+  {% if site and site.site_plan %}
+  <div class="thumb-preview">
+    <img src="{{ media_url(site.site_plan) }}" alt="Site plan" />
+  </div>
+  {% endif %}
+
+  {% if not site %}
+  <h3 style="font-size:0.95rem;margin:24px 0 10px;color:var(--navy)">Plots on this site</h3>
+  <p style="font-size:0.85rem;color:var(--ink-muted);margin-bottom:10px">
+    Enter how many plots this site has. Each plot will have its own code, size, price and status.
+  </p>
+  <div class="form-group" style="max-width:200px">
+    <label>Number of plots *</label>
+    <input type="number" name="num_plots" id="numPlots" min="1" max="50" value="3" required />
+  </div>
+  <div id="plotsContainer" style="margin-top:16px"></div>
+  {% endif %}
+
+  <div class="form-actions" style="margin-top:24px">
+    <button type="submit" class="btn btn-primary">{{ "Save changes" if site else "Create site + plots" }}</button>
+    <a href="{{ url_for('admin.sites') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+
+{% if not site %}
+<script>
+(function () {
+  var input = document.getElementById("numPlots");
+  var container = document.getElementById("plotsContainer");
+  var priceFixed = document.getElementById("priceFixed");
+  if (!input || !container) return;
+
+  function isFixed() {
+    return priceFixed && priceFixed.value === "1";
+  }
+
+  function buildRows(n) {
+    var fixed = isFixed();
+    var html = "";
+    for (var i = 1; i <= n; i++) {
+      html += '<div class="plot-row" style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:#fafbfc">';
+      html += '<h4 style="font-size:0.9rem;margin:0 0 10px;color:var(--navy)">Plot ' + i + '</h4>';
+      html += '<div class="form-row">';
+      html += '<div class="form-group"><label>Plot code</label><input type="text" name="plot_code_' + i + '" placeholder="e.g. MPEMBA-0' + i + '" /></div>';
+      html += '<div class="form-group"><label>Size (m²)</label><input type="number" name="size_sqm_' + i + '" min="0" placeholder="450" /></div>';
+      html += '</div>';
+      if (!fixed) {
+        html += '<div class="form-row plot-price-row">';
+        html += '<div class="form-group"><label>Size label (optional)</label><input type="text" name="size_label_' + i + '" placeholder="e.g. Corner plot" /></div>';
+        html += '<div class="form-group"><label>Price (MWK)</label><input type="number" name="price_mwk_' + i + '" min="0" placeholder="4200000" /></div>';
+        html += '</div>';
+      } else {
+        html += '<div class="form-row"><div class="form-group"><label>Size label (optional)</label><input type="text" name="size_label_' + i + '" placeholder="e.g. Corner plot" /></div></div>';
+      }
+      html += '<div class="form-row">';
+      html += '<div class="form-group"><label>Type</label><select name="plot_type_' + i + '"><option>Residential</option><option>Investment</option><option>Commercial</option><option>Mixed</option></select></div>';
+      html += '<div class="form-group"><label>Status</label><select name="status_' + i + '"><option>Available</option><option>Reserved</option><option>Sold</option></select></div>';
+      if (!fixed) {
+        html += '<div class="form-group"><label>Price type</label><select name="price_is_from_' + i + '"><option value="0">Fixed</option><option value="1">From</option></select></div>';
+      }
+      html += '</div>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function rebuild() {
+    var n = parseInt(input.value, 10) || 1;
+    if (n < 1) n = 1;
+    if (n > 50) n = 50;
+    input.value = n;
+    buildRows(n);
+  }
+
+  input.addEventListener("change", rebuild);
+  input.addEventListener("input", function () {
+    var n = parseInt(input.value, 10) || 1;
+    if (n >= 1 && n <= 50) buildRows(n);
+  });
+  if (priceFixed) priceFixed.addEventListener("change", rebuild);
+  buildRows(parseInt(input.value, 10) || 3);
+})();
+</script>
+{% endif %}
+<script>
+(function () {
+  var sel = document.getElementById("priceFixed");
+  var priceGroup = document.getElementById("sitePriceGroup");
+  var applyGroup = document.getElementById("applyPriceGroup");
+  if (!sel) return;
+  function sync() {
+    var fixed = sel.value === "1";
+    if (priceGroup) {
+      priceGroup.style.display = fixed ? "" : "none";
+      var inp = document.getElementById("sitePriceMwk");
+      if (inp) inp.required = fixed;
+    }
+    if (applyGroup) applyGroup.style.display = fixed ? "" : "none";
+  }
+  sel.addEventListener("change", sync);
+  sync();
+})();
+</script>
+{% endblock %}

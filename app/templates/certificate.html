@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Land Purchase Certificate {{ certificate.reference }}{% endblock %}
+{% block content %}
+<section class="page agreement-screen">
+  <div class="container">
+    <div class="agreement-page" id="certificate">
+      <div class="agreement-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Legacies Realty" class="cert-logo" />
+        </div>
+        <div style="text-align:center">
+          <img class="qr-img" src="{{ qr_src }}" alt="QR {{ certificate.reference }}" />
+          <p style="font-size:.75rem;color:var(--ink-muted);margin-top:6px">Scan to verify</p>
+        </div>
+      </div>
+      <h2 style="font-family:var(--serif);margin-bottom:8px;color:var(--navy)">Land Purchase Certificate</h2>
+      <p style="color:var(--ink-muted);font-size:.9rem;margin-bottom:24px">Official record for the buyer named below.</p>
+      <div class="ref-box">
+        <div>
+          <div style="font-size:.72rem;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.04em">Unique reference</div>
+          <strong>{{ certificate.reference }}</strong>
+        </div>
+        <div style="font-size:.85rem;color:var(--ink-muted)">Keep this number safe</div>
+      </div>
+      <div class="agreement-grid">
+        <div class="field"><label>Buyer</label><span>{{ certificate.buyer_name }}</span></div>
+        <div class="field"><label>Plot ID</label><span>{{ certificate.plot.plot_code }}</span></div>
+        <div class="field"><label>Site</label><span>{{ certificate.plot.site.name }}</span></div>
+        <div class="field"><label>Location</label><span>{{ certificate.plot.site.city }}</span></div>
+        <div class="field"><label>Size</label><span>{{ certificate.plot.display_size() }}</span></div>
+        <div class="field"><label>Type</label><span>{{ certificate.plot.plot_type }}</span></div>
+        <div class="field"><label>Certificate date</label><span>{{ certificate.certificate_date.strftime('%d %B %Y') }}</span></div>
+        <div class="field"><label>Status</label><span>{{ certificate.status }}</span></div>
+        {% if certificate.plot.site.coordinates %}<div class="field"><label>Coordinates</label><span>{{ certificate.plot.site.coordinates }}</span></div>{% endif %}
+      </div>
+      <p style="font-size:.85rem;color:var(--ink-muted);border-top:1px solid var(--border);padding-top:20px">
+        Scan the QR or visit Legacies Realty and enter <strong>{{ certificate.reference }}</strong> to view these details online at any time.
+      </p>
+    </div>
+
+    <div class="no-print agreement-actions" style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <a class="btn btn-primary" href="{{ url_for('public.verify', ref=certificate.reference) }}">Open verification</a>
+      <button class="btn btn-outline-dark" type="button" onclick="window.print()">Print certificate</button>
+      <a class="btn btn-ghost" href="{{ url_for('public.home') }}">Back to site</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

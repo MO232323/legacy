@@ -1,0 +1,34 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ certificate.reference }}{% endblock %}
+{% block content %}
+<div class="admin-page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1>Land Purchase Certificate</h1>
+  <div style="display:flex;gap:8px">
+    <a href="{{ url_for('public.certificate_view', ref=certificate.reference) }}" class="btn btn-outline-dark" target="_blank">Public view ↗</a>
+    <form method="post" action="{{ url_for('admin.certificate_delete', cert_id=certificate.id) }}" onsubmit="return confirm('Delete this certificate? Plot will be marked Available.')">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </div>
+</div>
+<div class="admin-detail-card" style="max-width:640px">
+  <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px">
+      <p><strong>Reference:</strong> {{ certificate.reference }}</p>
+      <p><strong>Buyer:</strong> {{ certificate.buyer_name }}</p>
+      {% if certificate.buyer_phone %}<p><strong>Phone:</strong> {{ certificate.buyer_phone }}</p>{% endif %}
+      {% if certificate.buyer_email %}<p><strong>Email:</strong> {{ certificate.buyer_email }}</p>{% endif %}
+      <p><strong>Plot:</strong> {{ certificate.plot.plot_code }}</p>
+      <p><strong>Site:</strong> {{ certificate.plot.site.name }} ({{ certificate.plot.site.city }})</p>
+      <p><strong>Size:</strong> {{ certificate.plot.display_size() }}</p>
+      <p><strong>Type:</strong> {{ certificate.plot.plot_type }}</p>
+      <p><strong>Date:</strong> {{ certificate.certificate_date.strftime('%d %B %Y') }}</p>
+      <p><strong>Status:</strong> {{ certificate.status }}</p>
+      {% if certificate.notes %}<p><strong>Notes:</strong> {{ certificate.notes }}</p>{% endif %}
+    </div>
+    <div style="text-align:center">
+      <img src="{{ qr_src }}" alt="QR {{ certificate.reference }}" style="width:140px;height:140px;border:1px solid var(--border);border-radius:8px" />
+      <p style="font-size:0.8rem;color:var(--ink-muted);margin-top:6px">Scan to verify</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

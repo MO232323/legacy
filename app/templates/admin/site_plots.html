@@ -1,0 +1,56 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Plots — {{ site.name }}{% endblock %}
+{% block content %}
+<div class="admin-page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1>Plots on {{ site.name }}</h1>
+    <p style="color:var(--ink-muted);margin:4px 0 0">{{ site.site_code }} · {{ site.city }}</p>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a href="{{ url_for('admin.plot_new_for_site', site_id=site.id) }}" class="btn btn-primary">+ Add plot</a>
+    <a href="{{ url_for('admin.site_edit', site_id=site.id) }}" class="btn btn-outline">Edit site</a>
+    <a href="{{ url_for('admin.sites') }}" class="btn btn-outline-dark">All sites</a>
+  </div>
+</div>
+{% if site.plots %}
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Plot code</th>
+      <th>Size</th>
+      <th>Type</th>
+      <th>Price</th>
+      <th>Status</th>
+      <th>Certificate</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in site.plots %}
+    <tr>
+      <td><strong>{{ p.plot_code }}</strong></td>
+      <td>{{ p.display_size() }}</td>
+      <td>{{ p.plot_type }}</td>
+      <td>{{ format_plot_price(p) }}</td>
+      <td>{{ p.status }}</td>
+      <td>
+        {% if p.certificate %}
+        <a href="{{ url_for('admin.certificate_detail', cert_id=p.certificate.id) }}">{{ p.certificate.reference }}</a>
+        {% else %}
+        —
+        {% endif %}
+      </td>
+      <td style="white-space:nowrap">
+        <a href="{{ url_for('admin.plot_edit', plot_id=p.id) }}" class="btn btn-sm btn-outline">Edit</a>
+        <form method="post" action="{{ url_for('admin.plot_delete', plot_id=p.id) }}" style="display:inline" onsubmit="return confirm('Delete this plot?')">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="color:var(--ink-muted)">No plots yet. <a href="{{ url_for('admin.plot_new_for_site', site_id=site.id) }}">Add a plot</a>.</p>
+{% endif %}
+{% endblock %}

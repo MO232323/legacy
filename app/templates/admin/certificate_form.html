@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}New certificate{% endblock %}
+{% block content %}
+<h1>New Land Purchase Certificate</h1>
+<p style="color:var(--ink-muted);margin-bottom:20px">Select an available plot and enter buyer details. A unique reference and QR code will be generated automatically.</p>
+{% if not available_plots %}
+<p class="flash flash-warning">No available plots. <a href="{{ url_for('admin.sites') }}">Add a site with plots</a> first.</p>
+{% else %}
+<form method="post" class="admin-form">
+  <div class="form-group">
+    <label for="plot_id">Plot *</label>
+    <select id="plot_id" name="plot_id" required>
+      <option value="">Select plot…</option>
+      {% for p in available_plots %}
+      <option value="{{ p.id }}">{{ p.plot_code }} — {{ p.site.city }} · {{ p.site.name }} ({{ p.display_size() }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="buyer_name">Buyer full name *</label>
+    <input type="text" id="buyer_name" name="buyer_name" required />
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="buyer_phone">Phone</label>
+      <input type="tel" id="buyer_phone" name="buyer_phone" />
+    </div>
+    <div class="form-group">
+      <label for="buyer_email">Email</label>
+      <input type="email" id="buyer_email" name="buyer_email" />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="certificate_date">Certificate date *</label>
+      <input type="date" id="certificate_date" name="certificate_date" value="{{ today }}" required />
+    </div>
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option>Certificate issued</option>
+        <option>Title process underway</option>
+        <option>Completed</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="notes">Internal notes</label>
+    <textarea id="notes" name="notes" rows="2"></textarea>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Create certificate + QR</button>
+    <a href="{{ url_for('admin.certificates') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

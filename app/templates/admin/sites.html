@@ -1,0 +1,45 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Sites{% endblock %}
+{% block content %}
+<div class="admin-page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <h1>Sites</h1>
+  <a href="{{ url_for('admin.site_new') }}" class="btn btn-primary">+ Add site</a>
+</div>
+<p style="color:var(--ink-muted);margin-bottom:20px">A site is a development/estate that contains multiple plots. Description, photos and layout plan are shared by the site.</p>
+{% if sites %}
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Site code</th>
+      <th>Name</th>
+      <th>City</th>
+      <th>Plots</th>
+      <th>Available</th>
+      <th>From price</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sites %}
+    <tr>
+      <td><strong>{{ s.site_code }}</strong></td>
+      <td>{{ s.name }}</td>
+      <td>{{ s.city }}</td>
+      <td>{{ s.plots|length }}</td>
+      <td>{{ s.available_count() }}</td>
+      <td>{{ format_site_price(s) }}</td>
+      <td style="white-space:nowrap">
+        <a href="{{ url_for('admin.site_plots', site_id=s.id) }}" class="btn btn-sm btn-outline-dark">Plots</a>
+        <a href="{{ url_for('admin.site_edit', site_id=s.id) }}" class="btn btn-sm btn-outline">Edit</a>
+        <form method="post" action="{{ url_for('admin.site_delete', site_id=s.id) }}" style="display:inline" onsubmit="return confirm('Delete this site and all its plots?')">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="color:var(--ink-muted)">No sites yet. <a href="{{ url_for('admin.site_new') }}">Add your first site</a>.</p>
+{% endif %}
+{% endblock %}

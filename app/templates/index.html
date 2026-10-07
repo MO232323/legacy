@@ -3,45 +3,43 @@
 {% block content %}
 <section class="hero" id="home">
   <div class="hero-slides" aria-hidden="true">
-    <div class="hero-slide is-active" style="background-image:url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1920&q=80')"></div>
-    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=1920&q=80')"></div>
-    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80')"></div>
-    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="hero-slide is-active" style="background-image:url('{{ url_for('static', filename='img/reference/6.jpg') }}')"></div>
+    <div class="hero-slide" style="background-image:url('{{ url_for('static', filename='img/reference/7.jpg') }}')"></div>
+    <div class="hero-slide" style="background-image:url('{{ url_for('static', filename='img/reference/8.jpg') }}')"></div>
+    <div class="hero-slide" style="background-image:url('{{ url_for('static', filename='img/reference/1.jpg') }}')"></div>
+    <div class="hero-slide" style="background-image:url('{{ url_for('static', filename='img/reference/9.jpg') }}')"></div>
+    <div class="hero-slide" style="background-image:url('{{ url_for('static', filename='img/reference/10.jpg') }}')"></div>
   </div>
   <div class="hero-overlay"></div>
-  <div class="container hero-content">
-    <p class="eyebrow">Trusted land partners in Malawi</p>
-    <h1>Your plot.<br />Your proof.<br />Your legacy.</h1>
-    <p class="hero-lead">
-      Legacies Realty delivers residential and investment plots with a unique QR-coded sale agreement.
-      Scan anytime to confirm ownership — clear, permanent, and online.
-    </p>
-    <div class="hero-actions">
-      <a href="{{ url_for('public.plots_list') }}" class="btn btn-primary">Browse plots</a>
-      <a href="{{ url_for('public.verify') }}" class="btn btn-outline">Verify ownership</a>
-      <a href="{{ whatsapp_link() }}" class="btn btn-whatsapp" target="_blank" rel="noopener">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      WhatsApp us
-    </a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><strong>4</strong><span>Cities</span></div>
-      <div class="stat"><strong>QR</strong><span>Instant proof</span></div>
-      <div class="stat"><strong>24/7</strong><span>Online verify</span></div>
+  <div class="hero-dots" id="heroDots" aria-label="Slideshow controls"></div>
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <p class="hero-kicker">Trusted in Malawi</p>
+      <h1>Your plot. Your proof.<br />Your legacy.</h1>
+      <div class="hero-rule"></div>
+      <p class="hero-lead">QR-coded land purchase certificates for residential and investment land across Blantyre, Lilongwe, Mzuzu and Mangochi.</p>
+      <div class="hero-actions">
+        <a href="{{ url_for('public.sites_list') }}" class="btn btn-primary">Browse sites</a>
+        <a href="{{ url_for('public.verify') }}" class="btn btn-outline">Verify ownership</a>
+      </div>
     </div>
   </div>
+</section>
+
+<section class="promo-strip no-print" aria-label="Featured promotions">
+  <img src="{{ url_for('static', filename='img/reference/2.jpg') }}" alt="Legacies Realty — featured sites" />
 </section>
 
 <section class="section" id="how-it-works">
   <div class="container">
     <div class="section-header">
-      <p class="eyebrow">How it works</p>
-      <h2>Ownership you can check in seconds</h2>
-      <p class="section-lead">From viewing to digital proof — a transparent process built for peace of mind.</p>
+      <p class="eyebrow">The process</p>
+      <h2>Ownership you can prove in seconds</h2>
+      <p class="section-lead">From first viewing to permanent digital proof — a refined process designed for confidence.</p>
     </div>
     <div class="steps">
       <div class="step"><div class="step-num">01</div><h3>Choose your plot</h3><p>Browse listings with photos in Blantyre, Lilongwe, Mzuzu or Mangochi. Book a free site visit.</p></div>
-      <div class="step"><div class="step-num">02</div><h3>Receive your agreement</h3><p>You get a formal sale agreement with a unique reference and a printed QR code.</p></div>
+      <div class="step"><div class="step-num">02</div><h3>Receive your certificate</h3><p>You get a Land Purchase Certificate with a unique reference and a printed QR code.</p></div>
       <div class="step"><div class="step-num">03</div><h3>Scan anytime</h3><p>Point any phone at the QR. Your name, plot number, size and status appear instantly.</p></div>
       <div class="step"><div class="step-num">04</div><h3>Build with confidence</h3><p>No chasing files or office queues. Your proof stays online whenever you need it.</p></div>
     </div>
@@ -51,8 +49,8 @@
 <section class="section section-alt" id="locations">
   <div class="container">
     <div class="section-header">
-      <p class="eyebrow">Where we operate</p>
-      <h2>Plots across Malawi’s key cities</h2>
+      <p class="eyebrow">Locations</p>
+      <h2>Prime land across Malawi’s key cities</h2>
     </div>
     <div class="locations-grid">
       <article class="location-card"><div class="location-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10M9 6h.01M15 6h.01M9 10h.01M15 10h.01"/></svg></div><h3>Blantyre</h3><p>Commercial capital. High-demand residential and mixed-use plots.</p><ul><li>Serviced plots from 400 m²</li><li>Clear documentation</li></ul></article>
@@ -63,37 +61,37 @@
   </div>
 </section>
 
-<section class="section" id="plots">
+<section class="section" id="sites">
   <div class="container">
     <div class="section-header">
-      <p class="eyebrow">Featured listings</p>
-      <h2>Available plots</h2>
-      <p class="section-lead"><a href="{{ url_for('public.plots_list') }}" style="color:var(--red);font-weight:600">View all listings →</a></p>
+      <p class="eyebrow">Featured collection</p>
+      <h2>Available sites</h2>
+      <p class="section-lead"><a href="{{ url_for('public.sites_list') }}" style="color:var(--red);font-weight:600">View all sites →</a></p>
     </div>
     <div class="plots-grid">
-      {% for p in plots %}
+      {% for s in sites %}
       <article class="plot-card">
         <div class="plot-image-wrap">
-          {% if p.cover_image() %}
-          <img src="{{ url_for('static', filename=p.cover_image()) }}" alt="{{ p.title }}" loading="lazy" />
+          {% if s.cover_image() %}
+          <img src="{{ media_url(s.cover_image()) }}" alt="{{ s.name }}" loading="lazy" />
           {% else %}
-          <img src="{{ url_for('static', filename='img/plot-placeholder.svg') }}" alt="{{ p.title }}" class="plot-placeholder-img" />
+          <img src="{{ url_for('static', filename='img/plot-placeholder.svg') }}" alt="{{ s.name }}" class="plot-placeholder-img" />
           {% endif %}
-          <span class="plot-badge {% if p.status != 'Available' %}{{ p.status|lower }}{% endif %}">{{ p.status }}</span>
+          <span class="plot-badge">{{ s.available_count() }} available</span>
         </div>
         <div class="plot-body">
-          <div class="plot-city">{{ p.city }}</div>
-          <h3>{{ p.title }}</h3>
-          <p class="plot-meta">{{ p.size_sqm }} m² · {{ p.plot_type }}</p>
-          <p class="plot-price">{{ format_price(p.price_mwk) }}</p>
+          <div class="plot-city">{{ s.city }}</div>
+          <h3>{{ s.name }}</h3>
+          <p class="plot-meta">{{ s.site_code }} · {{ s.plots|length }} plot{{ 's' if s.plots|length != 1 else '' }}</p>
+          <p class="plot-price">{{ format_site_price(s) }}</p>
           <div class="plot-actions">
-            <a href="{{ url_for('public.plot_detail', plot_id=p.id) }}" class="btn btn-sm btn-outline-dark">Details</a>
-            <a href="{{ whatsapp_link(p.plot_code, p.title, p.city) }}" class="btn btn-sm btn-whatsapp" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>
+            <a href="{{ url_for('public.site_detail', site_id=s.id) }}" class="btn btn-sm btn-outline-dark">View site</a>
+            <a href="{{ whatsapp_link('', s.name, s.city) }}" class="btn btn-sm btn-whatsapp" target="_blank" rel="noopener">WhatsApp</a>
           </div>
         </div>
       </article>
       {% else %}
-      <p>No plots listed yet. Check back soon.</p>
+      <p>No sites listed yet. Check back soon.</p>
       {% endfor %}
     </div>
   </div>
@@ -105,8 +103,8 @@
       <div class="verify-copy">
         <p class="eyebrow">Buyer portal</p>
         <h2>Verify ownership instantly</h2>
-        <p>Enter the unique reference from your sale agreement, or scan the QR code printed on it. Plot details appear immediately.</p>
-        <p class="verify-note">Permanent digital proof for every Legacies Realty buyer.</p>
+        <p>Enter the unique reference from your Land Purchase Certificate, or scan the QR on it. Your plot details appear in moments.</p>
+        <p class="verify-note">Permanent digital proof — included with every Legacies Realty certificate.</p>
         <p style="margin-top:20px"><a href="{{ url_for('public.verify') }}" class="btn btn-primary">Go to verification</a></p>
       </div>
       <div class="verify-box">
@@ -131,7 +129,7 @@
   <div class="container">
     <div class="trust-grid">
       <div>
-        <h2>Why buyers choose Legacies Realty</h2>
+        <h2>Why discerning buyers choose us</h2>
         <ul class="trust-list">
           <li><strong>Digital proof of ownership</strong><span>QR + unique reference on every agreement. Check your plot 24/7.</span></li>
           <li><strong>Photo-rich listings</strong><span>See real plot images before you visit or commit.</span></li>
@@ -152,11 +150,12 @@
     <div class="contact-layout">
       <div>
         <p class="eyebrow light">Next step</p>
-        <h2>Book a free viewing</h2>
-        <p>Tell us where you’d like to buy. We’ll arrange a site visit at no cost — or message us on WhatsApp now.</p>
+        <h2>Book a private viewing</h2>
+        <p>Tell us where you’d like to invest. We’ll arrange a complimentary site visit — or message us on WhatsApp now.</p>
         <ul class="contact-details">
-          <li>📍 Blantyre · Lilongwe · Mzuzu · Mangochi</li>
-          <li>✉️ hello@legaciesrealty.mw</li>
+          <li>📍 CSC House, Room 221, Blantyre</li>
+          <li>📞 +265 991 134 404</li>
+          <li>📍 Serving Blantyre · Lilongwe · Mzuzu · Mangochi</li>
         </ul>
         <p style="margin-top:16px">
           <a href="{{ whatsapp_link() }}" class="btn btn-whatsapp" target="_blank" rel="noopener">
@@ -178,7 +177,7 @@
           </select>
         </div>
         <div class="form-group"><label for="message">Message (optional)</label><textarea id="message" name="message" rows="3" placeholder="Plot size, budget, preferred dates…"></textarea></div>
-        <button type="submit" class="btn btn-primary btn-block">Request free viewing</button>
+        <button type="submit" class="btn btn-book btn-block btn-lg">Request free viewing</button>
       </form>
     </div>
   </div>
